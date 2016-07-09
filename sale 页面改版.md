@@ -19,72 +19,11 @@ sale页面banner(**webapp/promotion/weekly_deal/banner.twig**)使用的是
 $month_day = date('j') % 5 + 1;	// j, 月份中的第几天, 没有前导零, 1 到 31 
 ```
 
-查看banner配置如下:
+需要执行的操作如下:
 
-```json
-{
-    "processor": "lestore\\banner\\BannerProcessor",
-    "tpl": "banner.htm",
-    "pattern": "",
-    "size": {
-        "height": 176,
-        "width": 990
-    },
-    "time": {
-        "start": "",
-        "end": ""
-    },
-    "urlRoot": "http:\/\/d3mna48k5fyuxs.cloudfront.net\/v5res",
-    "imgs": [
-        {
-            "id": "0",
-            "enable": {
-                "en": true,
-                "de": true,
-                "fr": true,
-                "es": true,
-                "se": true,
-                "no": true,
-                "it": true,
-                "pt": true,
-                "da": true,
-                "fi": true,
-                "ru": true,
-                "nl": true,
-                "ja": true
-            },
-            "title": [],
-            "url": "jjshouse\/2016-06-02\/images\/banners\/weeklydealbanner\/weeklydeal1\/1{lang}.jpg",
-            "active": true,
-            "areas": []
-        },
-        {
-            "id": "1",
-            "enable": {
-                "en": true,
-                "de": true,
-                "fr": true,
-                "es": true,
-                "se": true,
-                "no": true,
-                "it": true,
-                "pt": true,
-                "da": true,
-                "fi": true,
-                "ru": true,
-                "nl": true
-            },
-            "title": [],
-            "url": "jjshouse\/2015-02-02\/images\/banners\/wd1\/weekly-deal_{lang}.jpg",
-            "active": false,
-            "areas": []
-        }
-    ],
-    "effect": []
-}
-```
+目前宽屏的高度是508px, 窄屏的高度是390px. 更改 config中的size 参数.
 
-根据产品的需求, banner尺寸日后可能会调整.调整size参数即可.页面会自适应. 其中$deal_time时间样式可能需要调整.
+jjshouse.com/jjshouse.fr 需要插入宽屏的feature.
 
 
 
@@ -97,45 +36,28 @@ $month_day = date('j') % 5 + 1;	// j, 月份中的第几天, 没有前导零, 1 
 ```
 
 ```php
-public function process($params = array()){
-        global $container;
-        foreach ($params as $key => $param) {
-            $$key = $param;
-        }
-        if (isset($lang)) {
-            $this->lang = $lang;
-        }
-        if (!$this->isActive()) {
-            return false;
-        }
+# 主要代码截取如下
+$config = json_decode($this->instance->config, true);
+if (!empty($config['catIds'])) {
+  	$this->catIds = $config['catIds'];
+}
 
-        $config = json_decode($this->instance->config, true);
-        if (!empty($config['catIds'])) {
-            $this->catIds = $config['catIds'];
-        }
+$categoryService = $container['category'];
+$list = array();
 
-        $categoryService = $container['category'];
-        $list = array();
-
-        foreach ($this->catIds as $_catId) {
-            $list[$_catId] = $this->formatCatNode($catTree->getTreeNode($_catId));
-        }
-        foreach ($list as $key => $value) {
-            $list[$key]['url'] .= 'weekly-deal/';
-            // get category weekly-deal total
-            $resource = new CategoryResource(null, array(), $key, $list[$key]['url']);
-            $resource->extraFilters[CategoryResource::EXTRA_WEEKLY_DEAL] = true;
-            $plistQuery = $resource->buildQuery($lang, 1);
-            $plist = $container['plist']->get(new SearchListDesc($plistQuery));
-            $list[$key]['total'] = $plist->total();
-            $list[$key]['pic_path'] = $IMG_PATH . "wholesale-weekly-deal/{$key}.jpg";
-        }
-        $this->list = $list;
-
-        $this->title = Helper::nl('page_common_weekly_deal');
-
-        return true;
-    }
+foreach ($this->catIds as $_catId) {
+  	$list[$_catId] = $this->formatCatNode($catTree->getTreeNode($_catId));
+}
+foreach ($list as $key => $value) {
+    $list[$key]['url'] .= 'weekly-deal/';
+    // get category weekly-deal total
+    $resource = new CategoryResource(null, array(), $key, $list[$key]['url']);
+    $resource->extraFilters[CategoryResource::EXTRA_WEEKLY_DEAL] = true;
+    $plistQuery = $resource->buildQuery($lang, 1);
+    $plist = $container['plist']->get(new SearchListDesc($plistQuery));
+    $list[$key]['total'] = $plist->total();
+    $list[$key]['pic_path'] = $IMG_PATH . "wholesale-weekly-deal/{$key}.jpg";
+}
 ```
 
 其中feature config如下:
@@ -212,6 +134,37 @@ $web_container['extra_page_code'] = 'weekly_deal';
 
 
 
+##### 1.5 倒计时相关
+
+具体的代码文件是 src/lisa/js/common/header.js 和 src/lisa/js/mod/countdown.js
+
+主要代码截取如下:
+
+```javascript
+if ($('#weekly-deal-time')[0]) {
+    var weekly_time = r.end_time - r.now_time;
+    var weekly_deal_banner = new Countdown('#weekly-deal-time', weekly_time, 'days', false, true);
+    weekly_deal_banner.run();
+}
+```
+
+```javascript
+if (this.isWeeklyDeal) {
+    if (isDays) {
+        var dayTxtClass = "weekly_days_txt";
+    } else {
+        var dayTxtClass = "weekly_day_txt";
+    }
+    _day = '<span class="weekly_day">' + _day + '</span>';
+    _dayTxt = '<span class= ' + dayTxtClass + ' >' + _dayTxt + '</span>';
+    _hour = '<span class="weekly_hour">' + _hour + '</span>';
+    _minute = '<span class="weekly_minute">' + _minute + '</span>';
+    _second = '<span class="weekly_second">' + _second + '</span>';
+
+    var txt = _day + _dayTxt + _hour + _minute + _second;
+}
+```
+
 
 
 #### 2. SALE商品列表页改动
@@ -284,13 +237,13 @@ WHERE
 
 ##### 2.3 倒计时banner
 
-原先倒计时的逻辑由下列feature控制.
+倒计时banner的逻辑由下列feature控制.
 
 ```html
 {{ feature('/header-slogan/1.0/slim-banner') | raw}}
 ```
 
-并修改了配置, 使之在weekly deal 相关页面不显示.
+需要修改配置, 使之在weekly deal 相关页面不显示.
 
 ```json
 {
