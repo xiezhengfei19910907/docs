@@ -10,6 +10,7 @@ sale页面banner(**webapp/promotion/weekly_deal/banner.twig**)使用的是
 
 ```h t m l
 {{ feature("/banner/2.1/banner_weeklydeal_day#{month_day}")|raw }}
+{{ feature("/banner/2.1/banner_weeklydeal_day#{month_day}_wide")|raw }}
 ```
 
 其中
@@ -17,8 +18,6 @@ sale页面banner(**webapp/promotion/weekly_deal/banner.twig**)使用的是
 ```php
 $month_day = date('j') % 5 + 1;	// j, 月份中的第几天, 没有前导零, 1 到 31 
 ```
-
-
 
 查看banner配置如下:
 
@@ -165,21 +164,165 @@ public function process($params = array()){
 
 
 
+##### 1.3 倒计时banner
+
+具体内容见2.3 倒计时banner
+
+
+
+##### 1.4 宽窄屏
+
+```php
+$web_container["/widescreen/1.0/hera_screen"] = array('page_code', "extra_page_code");
+$web_container['extra_page_code'] = 'weekly_deal';
+```
+
+需要在对应的feature config 中添加 "extraPages":
+
+```json
+{
+    "pages": [
+        "index",
+        "filter",
+        "search",
+        "cart",
+        "orders",
+        "order",
+        "favorites",
+        "tickets",
+        "inquiries",
+        "addressbook",
+        "user",
+        "ticket",
+        "mycoupons"
+    ],
+    "bannerCatIds": [
+        "5",
+        "11",
+        "132",
+        "133",
+        "89"
+    ],
+    "extraPages": [
+        "weekly_deal"
+    ],
+    "processor": "prometheus\\widescreen\\WideScreenProcessor"
+}
+```
+
+
+
+
+
 #### 2. SALE商品列表页改动
 
-##### 2.1 每个分类显示47个商品
+##### 2.1 每个分类显示至少显示59个商品
 
-具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中
-
-
+具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中, 可能需要改动逻辑来满足条件.
 
 
+
+##### 2.2 面包屑相关
+
+对应feature是 
+
+```html
+{{ feature('/breadcrumb/1.0/cat_common')|raw }}
+```
+
+具体process代码在prometheus中已经覆写. 需要更新feature config 如下:
+
+```json
+{"processor":"prometheus\\category\\breadcrumb\\PrometheusBreadCrumbProcessor"}
+```
+
+需要执行如下sql用于更新语言包.
+
+```sql
+# backup
+select * from multilanguage where code = 'page_common_sale1';
+
+# exec
+UPDATE multilanguage
+SET en = 'Sale',
+ de = 'Sale',
+ fr = 'Soldes',
+ es = 'Oferta',
+ se = 'Rea',
+ NO = 'Salg',
+ it = 'Saldi',
+ pt = 'Promoção',
+ da = 'Salg',
+ fi = 'Tarjous',
+ ru = 'Скидки',
+ nl = 'Sale',
+ ar = 'تخفيض',
+ be = 'Sale',
+ hr = 'Sale',
+ cs = 'Sleva',
+ et = 'Sale',
+ el = 'Sale',
+ ht = 'Sale',
+ he = 'Sale',
+ hu = 'Sale',
+ `is` = 'Sale',
+ ga = 'Sale',
+ ja = 'Sale',
+ ko = 'Sale',
+ lt = 'Sale',
+ ms = 'Sale',
+ mt = 'Sale',
+ pl = 'Wyprzedaż',
+ sk = 'Sale',
+ sl = 'Sale',
+ tr = 'İndirim'
+WHERE
+	CODE = 'page_common_sale1';
+```
+
+
+
+##### 2.3 倒计时banner
+
+原先倒计时的逻辑由下列feature控制.
+
+```html
+{{ feature('/header-slogan/1.0/slim-banner') | raw}}
+```
+
+并修改了配置, 使之在weekly deal 相关页面不显示.
+
+```json
+{
+    "black_list": [
+        "index",
+        "promotion_BlackFriday",
+        "wholesale-weekly-deal"
+    ],
+    "banner_lang": [],
+    "processor": "prometheus\\header\\slogan\\SlimBannerSloganProcessor",
+    "show_timer": "true",
+    "close_text": "true"
+}
+```
+
+此处需要新加banner来满足weekly deal 的需求.
 
 
 
 #### 3.SALE商品详情页改动
 
+##### 3.1 在商品默认图片的左上角添加一个weekly deal 标签.
 
+具体商品详情页的默认图由下列feature实现.
+
+```html
+{{feature("/product-picture/1.0/thumb-picture/original")|raw}}
+```
+
+判断商品是否参加当前的 weekly deal 活动, 如果参加, 显示对应的折扣标签.
+
+**此处因为商品详情页改版,待改版完成后,再开发.**
 
 
 
