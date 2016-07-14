@@ -21,7 +21,7 @@ $month_day = date('j') % 5 + 1;	// j, 月份中的第几天, 没有前导零, 1 
 
 需要执行的操作如下:
 
-目前宽屏的高度是508px, 窄屏的高度是390px. 更改 config中的size 参数.
+目前宽屏的高度是508px, 窄屏的高度是390px. 更改 config中的size 参数.(其中宽屏是要改css的)
 
 jjshouse.com/jjshouse.fr 需要插入宽屏的feature.
 
@@ -169,9 +169,9 @@ if (this.isWeeklyDeal) {
 
 #### 2. SALE商品列表页改动
 
-##### 2.1 每个分类显示至少显示59个商品
+##### 2.1 每个分类显示至少显示60个商品
 
-具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中, 可能需要改动逻辑来满足条件.
+具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中, 可能需要改动逻辑来满足条件.**(当前分类销量从高到低排列)**
 
 
 
@@ -237,6 +237,8 @@ WHERE
 
 ##### 2.3 倒计时banner
 
+**jjshouse.com 和 jjshouse.fr**
+
 倒计时banner的逻辑由下列feature控制.
 
 ```html
@@ -259,7 +261,69 @@ WHERE
 }
 ```
 
-此处需要新加banner来满足weekly deal 的需求.
+**jjshouse.co.uk**
+
+倒计时banner的逻辑由下列feature控制.
+
+```html
+{{ feature('/header-highlight/1.0/highlight')|raw }}
+```
+
+需要修改配置, 使之在weekly deal 相关页面不显示.
+
+```json
+{
+    "widePagesCode": [
+        "filter",
+        "search",
+        "cart"
+    ],
+    "black_pages": [
+        "flash_sale",
+        "promotion_sale",
+        "bannerpage",
+        "promotion_BlackFriday",
+        "wholesale-weekly-deal"
+    ],
+    "processor": "prometheus\\header\\highlight\\HighLightProcessor",
+    "tpl": "webapp\/common\/header\/highlight_extend.twig",
+    "disableCountDown": "false"
+}
+```
+
+
+
+##### 2.4 倒计时
+
+需要新增feaure实现
+
+```html
+<div class="list_banner">
+    <div class="list_narrow_banner">
+        {{ feature("/banner/2.1/banner_weeklydeal_list")|raw }}
+    </div>
+    <div class="list_wide_banner">
+        {{ feature("/banner/2.1/banner_weeklydeal_list_wide")|raw }}
+    </div>
+</div>
+<span id="weekly-deal-list-time"></span>
+```
+
+
+
+##### 2.5 more items
+
+在每页商品数量不满足60个的情况 和 当前分类只有60个商品的情况下显示more链接
+
+```html
+{% if weeklyDeal and ((ijk <= 59) or (total == 60) %}
+    <div class="more_items">
+        <a href="{{ catUrl }}" target="_blank" title="{{ catName }}">
+            {{ 'page_gallery_shop'|nl }}{{ 'page_common_more'|nl }} {{ catName }} >>
+        </a>
+    </div>
+{% endif %}
+```
 
 
 
