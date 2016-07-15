@@ -67,15 +67,15 @@ foreach ($list as $key => $value) {
     "processor": "lestore\\promotion\\browse\\CleanBrowseProcessor",
     "catIds": [
         2,
-        4,
+        5,
         7,
         8,
-        3,
-        5,
-        89,
-        132,
-        133,
-        84
+        16,
+        17,
+        18,
+        22,
+        84,
+        89
     ]
 }
 ```
@@ -171,7 +171,7 @@ if (this.isWeeklyDeal) {
 
 ##### 2.1 每个分类显示至少显示60个商品
 
-具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中, 可能需要改动逻辑来满足条件.**(当前分类销量从高到低排列)**
+具体weekly deal生成的逻辑在jjs_editor.git  cronjob/insert_weekly_deal_goods.php中, 通过改动逻辑来实现. 使之每个品类weekly deal至少有60件商品上榜.
 
 
 
@@ -316,7 +316,7 @@ WHERE
 在每页商品数量不满足60个的情况 和 当前分类只有60个商品的情况下显示more链接
 
 ```html
-{% if weeklyDeal and ((ijk <= 59) or (total == 60) %}
+{% if weeklyDeal and ((ijk <= 59) or (total == 60)) %}
     <div class="more_items">
         <a href="{{ catUrl }}" target="_blank" title="{{ catName }}">
             {{ 'page_gallery_shop'|nl }}{{ 'page_common_more'|nl }} {{ catName }} >>
