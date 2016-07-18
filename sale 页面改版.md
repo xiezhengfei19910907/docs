@@ -74,8 +74,8 @@ foreach ($list as $key => $value) {
         17,
         18,
         22,
-        84,
-        89
+        89,
+        84
     ]
 }
 ```
@@ -349,41 +349,57 @@ WHERE
 
 feature: nav/1.0/header_light
 
-需要删除如下内容即可.
+sale修改成如下结果:
 
 ```json
-,
-"promotion": [
-  {
-    "cat_id": 3,
-    "filter": "/pmin0/pmax100",
-    "name": {
-      "fn": "price",
-      "params": {
-        "code": "page_common_dresses_under",
-        "price": 100
-      }
-    }
-  },
-  {
-    "cat_id": 5,
-    "name": {
-      "fn": "lang",
-      "params": {
-        "code": "page_common_sale_all_accessories"
-      }
-    }
-  },
-  {
-    "cat_id": 33,
-    "name": {
-      "fn": "lang",
-      "params": {
-        "code": "page_common_fabric_swatch"
-      }
-    }
-  }
-]
+{
+    "cat_id": 999999,
+    "class": "red",
+    "ordinary": [
+        [
+            {
+                "cat_id": 2,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 8,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 18,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 7,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 16,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 22,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 17,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 5,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 89,
+                "filter": "/weekly-deal"
+            },
+            {
+                "cat_id": 84,
+                "filter": "/weekly-deal"
+            }
+        ]
+    ]
+}
 ```
 
 
