@@ -66,16 +66,7 @@ foreach ($list as $key => $value) {
 {
     "processor": "lestore\\promotion\\browse\\CleanBrowseProcessor",
     "catIds": [
-        2,
-        5,
-        7,
-        8,
-        16,
-        17,
-        18,
-        22,
-        89,
-        84
+        2,7,8,18,16,22,17,5,89,84
     ]
 }
 ```
@@ -362,15 +353,15 @@ sale修改成如下结果:
                 "filter": "/weekly-deal"
             },
             {
+                "cat_id": 7,
+                "filter": "/weekly-deal"
+            },
+            {
                 "cat_id": 8,
                 "filter": "/weekly-deal"
             },
             {
                 "cat_id": 18,
-                "filter": "/weekly-deal"
-            },
-            {
-                "cat_id": 7,
                 "filter": "/weekly-deal"
             },
             {
@@ -401,12 +392,5 @@ sale修改成如下结果:
     ]
 }
 ```
-
-
-
-
-
-
-
 
 
