@@ -239,11 +239,11 @@ public function process($order, $lang_code) {
 
 ##### 2.2.2 请求失败后, 会更改订单的支付方式为wire transfer. 
 
-失败后显示香港的银行帐号. 失败的可能原因如下:
+失败后显示香港的银行帐号. gc返回的数据记录在pay_log表中. 失败的可能原因如下:
 
--   我们的ip不在gc的ip白名单中, gc返回数据如下:
+- 我们的ip不在gc的ip白名单中, gc返回数据如下:
 
-    ```xml
+  ```xml
         <XML>
             <REQUEST>
                 <ACTION>INSERT_ORDERWITHPAYMENT</ACTION>
@@ -291,16 +291,15 @@ public function process($order, $lang_code) {
                 </RESPONSE>
             </REQUEST>
         </XML>
-    ```
+  ```
 
     **解决方式: 联系财务通知gc, 添加ip到gc的ip白名单.**
 
-    ​
 
 
--   订单中的国家 + 货币, gc bank transfer 不支持. gc返回数据如下:
+- 订单中的国家 + 货币, gc bank transfer 不支持. gc返回数据如下:
 
-    ```xml
+  ```xml
         <XML>
             <REQUEST>
                 <ACTION>INSERT_ORDERWITHPAYMENT</ACTION>
@@ -353,12 +352,67 @@ public function process($order, $lang_code) {
                 </RESPONSE>
             </REQUEST>
         </XML>
-    ```
+  ```
 
     **解决方式: 联系产品, 决定是否需要修改该国家 + 货币的支付方式.**
 
 
+- 订单金额超过了gc bank transfer的范围. gc返回数据如下:
 
+  ```xml
+  <XML>
+      <REQUEST>
+          <ACTION>INSERT_ORDERWITHPAYMENT</ACTION>
+          <META>
+              <MERCHANTID>7441</MERCHANTID>
+              <IPADDRESS>50.19.255.229</IPADDRESS>
+              <VERSION>2.0</VERSION>
+              <REQUESTIPADDRESS>127.0.0.2</REQUESTIPADDRESS>
+          </META>
+          <PARAMS>
+              <ORDER>
+                  <ORDERID>3273203462</ORDERID>
+                  <MERCHANTREFERENCE>_3273203462_160728023256</MERCHANTREFERENCE>
+                  <AMOUNT>8420808</AMOUNT>
+                  <CURRENCYCODE>GBP</CURRENCYCODE>
+                  <LANGUAGECODE>en</LANGUAGECODE>
+                  <COUNTRYCODE>GI</COUNTRYCODE>
+                  <SURNAME>dh</SURNAME>
+                  <CITY>xghhh</CITY>
+                  <FIRSTNAME>dfgg</FIRSTNAME>
+                  <STREET>xghhgffhhh</STREET>
+                  <ADDITIONALADDRESSINFO/>
+                  <ZIP>cdfdggg</ZIP>
+                  <STATE>dfggg</STATE>
+              </ORDER>
+              <PAYMENT>
+                  <PAYMENTPRODUCTID>11</PAYMENTPRODUCTID>
+                  <AMOUNT>8420808</AMOUNT>
+                  <CURRENCYCODE>GBP</CURRENCYCODE>
+                  <COUNTRYCODE>GI</COUNTRYCODE>
+                  <LANGUAGECODE>en</LANGUAGECODE>
+                  <HOSTEDINDICATOR>0</HOSTEDINDICATOR>
+              </PAYMENT>
+          </PARAMS>
+          <RESPONSE>
+              <RESULT>NOK</RESULT>
+              <META>
+                  <RESPONSEDATETIME>20160728113257</RESPONSEDATETIME>
+                  <REQUESTID>11539387</REQUESTID>
+              </META>
+              <ERROR>
+                  <CODE>410120</CODE>
+                  <MESSAGE>AMOUNT_NOT_BETWEEN_MINAMOUNT_AND_MAXAMOUNT</MESSAGE>
+              </ERROR>
+              <ROW>
+                  <ORDERID>3273203462</ORDERID>
+              </ROW>
+          </RESPONSE>
+      </REQUEST>
+  </XML>
+  ```
+
+  ​
 
 
 
